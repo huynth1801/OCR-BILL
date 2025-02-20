@@ -35,10 +35,10 @@ def extract_transaction_details(text_list):
     time_pattern = r'\b\d{2}/\d{2}/\d{4}(?:\s+\d{2}:\d{2})?\b'  # Thời gian dạng: DD/MM/YYYY HH:mm hoặc DD/MM/YYYY
     fee_pattern = r"\bPhí[:]? (\d{1,3}(?:[ .,]?\d{3})*)\b"  # Phí giao dịch (nếu có)
     description_pattern = r"(?:ND|Nội dung|Description)[:]? (.+)"  # Nội dung chuyển khoản
-    status_pattern = r"(Thành công|Thất bại|Pending|Hoàn tiền)"  # Trạng thái giao dịch
+    status_pattern = r"(Thành công|Thất bại|Hoàn tiền)"  # Trạng thái giao dịch
 
     # 🔹 Regex tìm tên người nhận (IN HOA, có thể có số)
-    recipient_pattern = r'(?:Thông tin người nhận|Người nhận|TO|Đến tài khoản|Beneficiary)[:\s]*([A-ZĐÂÊÔƠƯÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰ\s]+)'
+    recipient_pattern = r'Đến tài khoản\s+\d+\s+([A-ZĐÂÊÔƠƯÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰ\s]+)'
 
     for text in text_list:
         text = text.strip()
@@ -81,10 +81,11 @@ def extract_transaction_details(text_list):
         if match_fee:
             extracted_data["transaction_fee"] = match_fee.group(1)
 
-        # 🔹 Kiểm tra tên người nhận
-        match = re.search(recipient_pattern, text)
-        if match:
-            extracted_data["recipient_name"] = match.group(1)
+        if "Đến tài khoản" in text:
+            match = re.search(recipient_pattern, " ".join(text_list))
+            if match:
+                extracted_data['recipient_name'] = match.group(1).strip()
+
 
     return extracted_data
 
