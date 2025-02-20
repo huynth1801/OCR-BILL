@@ -1,26 +1,27 @@
-# 🐍 Sử dụng Python 3.10 trở lên làm base image
 FROM python:3.10-slim
 
-# 🏠 Đặt thư mục làm việc trong container
 WORKDIR /app
 
-# 🏗 Cài đặt các gói hệ thống cần thiết
-RUN apt-get update && apt-get install -y \
-    tesseract-ocr \
-    libgl1-mesa-glx \
+# Install necessary system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    g++ \
+    python3-dev \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# 📥 Copy file requirements vào container
-COPY requirements.txt .
+# Upgrade pip and install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip
 
-# 📦 Cài đặt các thư viện Python
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 📥 Copy toàn bộ mã nguồn vào container
-COPY . .
+COPY src /app
 
-# 🔥 Mở cổng 8000
 EXPOSE 8000
 
-# 🚀 Chạy ứng dụng
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

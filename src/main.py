@@ -106,7 +106,7 @@ async def upload_file(file: UploadFile = File(...)):
     # Trích xuất thông tin giao dịch từ văn bản OCR
     transaction_data = extract_transaction_details(results)
 
-    return {"filename": file.filename, "transaction_data": transaction_data}
+    return {"filename": file.filename, "transaction_data": transaction_data, "raw_data": results}
 
 
 # Chạy server nếu chạy trực tiếp file này
